@@ -1109,7 +1109,7 @@ class ActionComm extends CommonObject
      */
     function getNomUrl($withpicto=0,$maxlength=0,$classname='',$option='',$overwritepicto=0, $notooltip=0)
     {
-		global $conf, $langs, $user, $hookmanager;
+		global $conf, $langs, $user, $hookmanager, $db;
 
 		if (! empty($conf->dol_no_mouse_hover)) $notooltip=1;   // Force disable tooltips
 		
@@ -1183,6 +1183,25 @@ class ActionComm extends CommonObject
         else
         {
             $libelle=(empty($this->libelle)?$label:$this->libelle.(($label && $label != $this->libelle)?' '.$label:''));
+            if($conf->global->AGENDA_USE_CUSTOM_LIBELLE){
+                $this->fetch_optionals($this->id);
+                $libelle = "";
+                $pattern = $conf->global->AGENDA_USE_CUSTOM_LIBELLE;
+                foreach(preg_split("/:/",$pattern) as $key){
+                    if(isset($this->{$key})){
+                        $libelle .= $this->{$key};
+                        continue;
+                    }
+
+                    if(isset($this->array_options["options_".$key])){
+                        $libelle .= $this->array_options["options_".$key];
+                        continue;
+                    }
+
+                    $libelle.=" ".$key;
+                }
+            }
+
             if (! empty($conf->global->AGENDA_USE_EVENT_TYPE) && empty($libelle)) $libelle=$labeltype;
             if ($maxlength < 0) $libelleshort=$this->ref;
             else $libelleshort=dol_trunc($libelle,$maxlength);
