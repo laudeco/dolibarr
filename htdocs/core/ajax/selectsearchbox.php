@@ -140,11 +140,10 @@ if (! empty($conf->hrm->enabled) && ! empty($conf->global->MAIN_SEARCHFORM_EMPLO
 // Execute hook addSearchEntry
 $parameters=array('search_boxvalue'=>$search_boxvalue);
 $reshook=$hookmanager->executeHooks('addSearchEntry',$parameters);
-if (empty($reshook))
+if (!empty($reshook))
 {
 	$arrayresult=array_merge($arrayresult, $hookmanager->resArray);
 }
-else $arrayresult=$hookmanager->resArray;
 
 
 // Print output if called by ajax or do nothing (var $arrayresult will be used) if called by an include
