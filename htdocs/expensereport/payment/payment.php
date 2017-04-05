@@ -27,6 +27,8 @@ require_once DOL_DOCUMENT_ROOT.'/expensereport/class/expensereport.class.php';
 require_once DOL_DOCUMENT_ROOT.'/expensereport/class/paymentexpensereport.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
+global $db, $user;
+
 $langs->load("bills");
 $langs->load("banks");
 
@@ -34,6 +36,9 @@ $chid=GETPOST("id");
 $action=GETPOST('action');
 $amounts = array();
 $accountid=GETPOST('accountid','int');
+
+$expensereport = new ExpenseReport($db);
+$expensereport->fetch($chid);
 
 // Security check
 $socid=0;
@@ -134,6 +139,20 @@ if ($action == 'add_payment')
                 }
             }
 
+            if (! $error)
+            {
+                $payment->fetch($paymentid);
+                if($expensereport->total_ttc- $payment->amount == 0){
+                    $result = $expensereport->set_paid($expensereport->id, $user);
+                    if (! $result > 0)
+                    {
+                        $errmsg=$payment->error;
+                        $error++;
+                    }
+                }
+
+            }
+
     	    if (! $error)
             {
                 $db->commit();
@@ -164,8 +183,7 @@ $form=new Form($db);
 // Form to create expense report payment
 if (GETPOST("action") == 'create')
 {
-	$expensereport = new ExpenseReport($db);
-	$expensereport->fetch($chid);
+
 
 	$total = $expensereport->total_ttc;
 

@@ -30,6 +30,13 @@ require_once DOL_DOCUMENT_ROOT .'/core/class/commonobject.class.php';
  */
 class ExpenseReport extends CommonObject
 {
+    const STATUS_PENDING_PAYED = 7;
+    const STATUS_PAYED = 6;
+    const STATUS_APPROVED = 5;
+    const STATUS_CANCELED = 4;
+    const STATUS_VALIDATED = 2;
+    const STATUS_DRAFT = 0;
+
     var $element='expensereport';
     var $table_element='expensereport';
     var $table_element_line = 'expensereport_det';
@@ -44,7 +51,7 @@ class ExpenseReport extends CommonObject
 
     var $fk_user_validator;
     var $status;
-    var $fk_statut;     // -- 0=draft, 2=validated (attente approb), 4=canceled, 5=approved, 6=payed, 99=denied
+    var $fk_statut;     // -- 0=draft, 2=validated (attente approb), 4=canceled, 5=approved, 6=payed, 7=pending payed, 99=denied
     var $fk_c_paiement;
     var $paid;
 
@@ -509,7 +516,7 @@ class ExpenseReport extends CommonObject
 		
         $sql = "UPDATE ".MAIN_DB_PREFIX."expensereport";
         $sql.= " SET fk_statut = 6, paid=1";
-        $sql.= " WHERE rowid = ".$id." AND fk_statut = 5";
+        $sql.= " WHERE rowid = ".$id." AND (fk_statut = 5 OR fk_statut = 7)";
 
         dol_syslog(get_class($this)."::set_paid sql=".$sql, LOG_DEBUG);
         $resql=$this->db->query($sql);
@@ -1964,7 +1971,23 @@ class ExpenseReport extends CommonObject
         }
         else
             return ($this->datevalid?$this->datevalid:$this->date_valid) < ($now - $conf->expensereport->payment->warning_delay);
-    }    
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPendingPayed()
+    {
+        return (int)$this->fk_statut === self::STATUS_PENDING_PAYED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isApproved()
+    {
+        return (int)$this->fk_statut === self::STATUS_APPROVED;
+    }
 }
 
 

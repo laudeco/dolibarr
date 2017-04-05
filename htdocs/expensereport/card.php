@@ -2212,13 +2212,13 @@ if ($action != 'create' && $action != 'edit')
 	// If status is Appoved
 	// --------------------
 	
-	if ($user->rights->expensereport->approve && $object->fk_statut == 5)
+	if ($user->rights->expensereport->approve && $object->isApproved())
 	{
 	    print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?action=refuse&id='.$object->id.'">'.$langs->trans('Deny').'</a></div>';
 	}
 	
 	// If bank module is used
-	if ($user->rights->expensereport->to_paid && ! empty($conf->banque->enabled) && $object->fk_statut == 5)
+	if ($user->rights->expensereport->to_paid && ! empty($conf->banque->enabled) && ($object->isApproved() || $object->isPendingPayed()))
 	{
 		// Pay
 		if ($remaintopay == 0)
