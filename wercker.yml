@@ -47,8 +47,8 @@ deploy:
     - script:
         name: rsync
         code: |-
-          rsync -avz -e "ssh -i $PRIVATEKEY_PATH" -h --stats \
+          rsync -ravz -e "ssh -i $PRIVATEKEY_PATH" -h --stats \
           --update \
-          --include 'htdocs/*' \
-          --include 'scripts/*' \
+          --include 'htdocs/***' \
+          --include 'scripts/***' \
           --exclude '*' . belgianb@ftp.cluster006.ovh.net:/homez.577/belgianb/www/intranetlx
