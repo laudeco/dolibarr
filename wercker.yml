@@ -42,6 +42,9 @@ deploy:
         overwrite: true
         hide-from-log: true
     - script:
+        name: ls
+        code: ls -lsa
+    - script:
         name: rsync
         code: |-
           rsync -avz -e "ssh -i $PRIVATEKEY_PATH" -h --stats \
