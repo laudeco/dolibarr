@@ -48,4 +48,4 @@ deploy:
           --update \
           --exclude '*' \
           --include 'htdocs/***' \
-          --include 'scripts/***'  . belgianb@ssh1.media.ha.ovh.net:/homez.577/belgianb/www/intranetlx
+          --include 'scripts/***'  . belgianb@ftp.cluster006.ovh.net:/homez.577/belgianb/www/intranetlx
