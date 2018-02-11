@@ -1508,7 +1508,7 @@ function dol_print_reduction($reduction,$langs)
     }
     else
     {
-        $string = price($reduction).'%';
+    	$string = vatrate($reduction,true);
     }
 
     return $string;
@@ -2257,6 +2257,9 @@ function getModuleDirForApiClass($module)
     }
     elseif ($module == 'users') {
         $moduledirforclass = 'user';
+    }
+    elseif ($module == 'ficheinter' || $module == 'interventions') {
+    	$moduledirforclass = 'fichinter';
     }
 
     return $moduledirforclass;

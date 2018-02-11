@@ -647,14 +647,17 @@ if (empty($reshook))
                     setEventMessages($object->error, $object->errors, 'errors');
                   	$error++;
                 }
+				// Prevent thirdparty's emptying if a user hasn't rights $user->rights->categorie->lire (in such a case, post of 'custcats' is not defined)
+				if (!empty($user->rights->categorie->lire))
+				{
+					// Customer categories association
+					$categories = GETPOST( 'custcats', 'array' );
+					$object->setCategories($categories, 'customer');
 
-				// Customer categories association
-				$categories = GETPOST('custcats', 'array');
-				$object->setCategories($categories, 'customer');
-
-				// Supplier categories association
-				$categories = GETPOST('suppcats', 'array');
-				$object->setCategories($categories, 'supplier');
+					// Supplier categories association
+					$categories = GETPOST('suppcats', 'array');
+					$object->setCategories($categories, 'supplier');
+				}
 
                 // Logo/Photo save
                 $dir     = $conf->societe->multidir_output[$object->entity]."/".$object->id."/logos";
@@ -1893,6 +1896,7 @@ else
 					$cate_arbo = $form->select_all_categories(Categorie::TYPE_CUSTOMER, null, null, null, null, 1);
 					$c = new Categorie($db);
 					$cats = $c->containing($object->id, Categorie::TYPE_CUSTOMER);
+					$arrayselected=array();
 					foreach ($cats as $cat) {
 						$arrayselected[] = $cat->id;
 					}
@@ -1907,6 +1911,7 @@ else
 					$cate_arbo = $form->select_all_categories(Categorie::TYPE_SUPPLIER, null, null, null, null, 1);
 					$c = new Categorie($db);
 					$cats = $c->containing($object->id, Categorie::TYPE_SUPPLIER);
+					$arrayselected=array();
 					foreach ($cats as $cat) {
 						$arrayselected[] = $cat->id;
 					}

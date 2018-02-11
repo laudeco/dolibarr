@@ -652,11 +652,14 @@ class Tva extends CommonObject
 	 *	@param	int		$withpicto		0=No picto, 1=Include picto into link, 2=Only picto
 	 *	@param	string	$option			link option
      *  @param	int  	$notooltip		1=Disable tooltip
+     *  @param	string	$morecss		More CSS
 	 *	@return	string					Chaine with URL
 	 */
-	function getNomUrl($withpicto=0, $option='',  $notooltip=0)
+	function getNomUrl($withpicto=0, $option='', $notooltip=0, morecss='')
 	{
-		global $langs;
+		global $langs, $conf;
+
+		if (! empty($conf->dol_no_mouse_hover)) $notooltip=1;   // Force disable tooltips
 
 		$result='';
         $label=$langs->trans("ShowVatPayment").': '.$this->ref;

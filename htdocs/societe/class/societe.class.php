@@ -1153,6 +1153,7 @@ class Societe extends CommonObject
 		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_departements as d ON s.fk_departement = d.rowid';
 		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_typent as te ON s.fk_typent = te.id';
 		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_incoterms as i ON s.fk_incoterms = i.rowid';
+
 		$sql .= ' WHERE s.entity IN ('.getEntity($this->element).')';
 		if ($rowid)   $sql .= ' AND s.rowid = '.$rowid;
 		if ($ref)     $sql .= " AND s.nom = '".$this->db->escape($ref)."'";
@@ -3779,7 +3780,7 @@ class Societe extends CommonObject
 	 */
 	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
 	{
-		if ($origin_id == $id)
+		if ($origin_id == $dest_id)
 		{
 			dol_syslog('Error: Try to merge a thirdparty into itself');
 			return false;
