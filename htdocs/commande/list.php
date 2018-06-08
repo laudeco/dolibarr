@@ -384,6 +384,7 @@ if ($resql)
 	$arrayofselected=is_array($toselect)?$toselect:array();
 
 	$param='';
+
 	if (! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param.='&contextpage='.urlencode($contextpage);
 	if ($limit > 0 && $limit != $conf->liste_limit) $param.='&limit='.urlencode($limit);
 	if ($sall)					$param.='&sall='.urlencode($sall);
@@ -401,12 +402,19 @@ if ($resql)
 	if ($search_user > 0) 		$param.='&search_user='.urlencode($search_user);
 	if ($search_sale > 0) 		$param.='&search_sale='.urlencode($search_sale);
 	if ($search_total_ht != '') $param.='&search_total_ht='.urlencode($search_total_ht);
-	if ($search_total_vat != '') $param.='&search_total_vat='.urlencode($search_total_vat);
-	if ($search_total_ttc != '') $param.='&search_total_ttc='.urlencode($search_total_ttc);
-	if ($search_project_ref >= 0)  	$param.="&search_project_ref=".urlencode($search_project_ref);
+	if ($search_total_vat != '')  $param.='&search_total_vat='.urlencode($search_total_vat);
+	if ($search_total_ttc != '')  $param.='&search_total_ttc='.urlencode($search_total_ttc);
+	if ($search_project_ref >= 0) $param.="&search_project_ref=".urlencode($search_project_ref);
+	if ($search_town != '')       $param .= '&search_town='.urlencode($search_town);
+	if ($search_zip != '')        $param .= '&search_zip='.urlencode($search_zip);
+	if ($search_state != '')      $param .= '&search_state='.urlencode($search_state);
+	if ($search_country != '')    $param .= '&search_country='.urlencode($search_country);
+	if ($search_type_thirdparty != '')  $param .= '&search_type_thirdparty='.urlencode($search_type_thirdparty);
+	if ($search_product_category != '') $param .= '&search_product_category='.urlencode($search_product_category);
 	if ($show_files)            $param.='&show_files=' .urlencode($show_files);
 	if ($optioncss != '')       $param.='&optioncss='.urlencode($optioncss);
 	if ($billed != '')			$param.='&billed='.urlencode($billed);
+
 	// Add $param from extra fields
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_param.tpl.php';
 
@@ -670,7 +678,7 @@ if ($resql)
 	// Status billed
 	if (! empty($arrayfields['c.facture']['checked']))
 	{
-		print '<td class="liste_titre maxwidthonsmartphone" align="right">';
+		print '<td class="liste_titre maxwidthonsmartphone" align="center">';
 		print $form->selectyesno('billed', $billed, 1, 0, 1);
 		print '</td>';
 	}
@@ -701,7 +709,7 @@ if ($resql)
 	// Extra fields
 	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_title.tpl.php';
 	// Hook fields
-	$parameters=array('arrayfields'=>$arrayfields);
+	$parameters=array('arrayfields'=>$arrayfields,'param'=>$param,'sortfield'=>$sortfield,'sortorder'=>$sortorder);
 	$reshook=$hookmanager->executeHooks('printFieldListTitle',$parameters);    // Note that $action and $object may have been modified by hook
 	print $hookmanager->resPrint;
 	if (! empty($arrayfields['c.datec']['checked']))     print_liste_field_titre($arrayfields['c.datec']['label'],$_SERVER["PHP_SELF"],"c.date_creation","",$param,'align="center" class="nowrap"',$sortfield,$sortorder);

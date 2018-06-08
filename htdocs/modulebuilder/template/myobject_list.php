@@ -95,14 +95,14 @@ $search_array_options=$extrafields->getOptionalsFromPost($extralabels,'','search
 if (! $sortfield) $sortfield="t.".key($object->fields);   // Set here default search field. By default 1st field in definition.
 if (! $sortorder) $sortorder="ASC";
 
-// Protection if external user
+// Security check
 $socid=0;
-if ($user->societe_id > 0)
+if ($user->societe_id > 0)	// Protection if external user
 {
 	//$socid = $user->societe_id;
 	accessforbidden();
 }
-//$result = restrictedArea($user, 'mymodule', $id,'');
+//$result = restrictedArea($user, 'mymodule', $id, '');
 
 // Initialize array of search criterias
 $search_all=trim(GETPOST("search_all",'alpha'));
@@ -407,7 +407,7 @@ foreach($object->fields as $key => $val)
 // Extra fields
 include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_title.tpl.php';
 // Hook fields
-$parameters=array('arrayfields'=>$arrayfields);
+$parameters=array('arrayfields'=>$arrayfields,'param'=>$param,'sortfield'=>$sortfield,'sortorder'=>$sortorder);
 $reshook=$hookmanager->executeHooks('printFieldListTitle', $parameters, $object);    // Note that $action and $object may have been modified by hook
 print $hookmanager->resPrint;
 print getTitleFieldOfList($selectedfields, 0, $_SERVER["PHP_SELF"],'','','','align="center"',$sortfield,$sortorder,'maxwidthsearch ')."\n";

@@ -77,7 +77,9 @@ $planned_workload=$planned_workloadhour*3600+$planned_workloadmin*60;
 $userAccess=0;
 
 
-
+$parameters=array('id'=>$id);
+$reshook=$hookmanager->executeHooks('doActions',$parameters,$object,$action);    // Note that $action and $object may have been modified by some hooks
+if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 /*
  * Actions
  */
@@ -578,7 +580,7 @@ else if ($id > 0 || ! empty($ref))
 		}
 		else
 		{
-			if ($nboftaskshown < count($tasksarray))
+			if ($nboftaskshown < count($tasksarray) && ! GETPOST('search_user_id','int'))
 			{
 				include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 				cleanCorruptedTree($db, 'projet_task', 'fk_task_parent');

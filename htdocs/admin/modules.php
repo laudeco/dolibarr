@@ -79,9 +79,9 @@ $familyinfo=array(
 
 $param='';
 if ($search_keyword) $param.='&search_keyword='.urlencode($search_keyword);
-if ($search_status > -1)  $param.='&search_status='.urlencode($search_status);
-if ($search_nature > -1)  $param.='&search_nature='.urlencode($search_nature);
-if ($search_version > -1) $param.='&search_version='.urlencode($search_version);
+if ($search_status && $search_status != '-1')  $param.='&search_status='.urlencode($search_status);
+if ($search_nature && $search_nature != '-1')  $param.='&search_nature='.urlencode($search_nature);
+if ($search_version && $search_version != '-1') $param.='&search_version='.urlencode($search_version);
 
 $dirins=DOL_DOCUMENT_ROOT.'/custom';
 $urldolibarrmodules='https://www.dolistore.com/';
@@ -466,7 +466,7 @@ if ($mode == 'common')
 {
     dol_set_focus('#search_keyword');
 
-    print '<form method="GET" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'">';
+    print '<form method="POST" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'">';
     if ($optioncss != '') print '<input type="hidden" name="optioncss" value="'.$optioncss.'">';
     print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
     print '<input type="hidden" name="sortfield" value="'.$sortfield.'">';
@@ -741,12 +741,12 @@ if ($mode == 'common')
         					if (preg_match('/^([^@]+)@([^@]+)$/i',$urlpage,$regs))
         					{
         						$urltouse=dol_buildpath('/'.$regs[2].'/admin/'.$regs[1],1);
-        						print '<a href="'.$urltouse.(preg_match('/\?/',$urltouse)?'&':'?').'backtopage='.urlencode($backtourl).'" title="'.$langs->trans("Setup").'">'.img_picto($langs->trans("Setup"),"setup",'style="padding-right: 6px"').'</a>';
+        						print '<a href="'.$urltouse.(preg_match('/\?/',$urltouse)?'&':'?').'save_lastsearch_values=1&backtopage='.urlencode($backtourl).'" title="'.$langs->trans("Setup").'">'.img_picto($langs->trans("Setup"),"setup",'style="padding-right: 6px"').'</a>';
         					}
         					else
         					{
         						$urltouse=$urlpage;
-        						print '<a href="'.$urltouse.(preg_match('/\?/',$urltouse)?'&':'?').'backtopage='.urlencode($backtourl).'" title="'.$langs->trans("Setup").'">'.img_picto($langs->trans("Setup"),"setup",'style="padding-right: 6px"').'</a>';
+        						print '<a href="'.$urltouse.(preg_match('/\?/',$urltouse)?'&':'?').'save_lastsearch_values=1&backtopage='.urlencode($backtourl).'" title="'.$langs->trans("Setup").'">'.img_picto($langs->trans("Setup"),"setup",'style="padding-right: 6px"').'</a>';
         					}
         				}
         			}
@@ -754,11 +754,11 @@ if ($mode == 'common')
         		}
         		else if (preg_match('/^([^@]+)@([^@]+)$/i',$objMod->config_page_url,$regs))
         		{
-        			print '<td class="tdsetuppicto right valignmiddle" width="60px"><a href="'.dol_buildpath('/'.$regs[2].'/admin/'.$regs[1],1).'?backtopage='.urlencode($backtourl).'" title="'.$langs->trans("Setup").'">'.img_picto($langs->trans("Setup"),"setup",'style="padding-right: 6px"').'</a></td>';
+        			print '<td class="tdsetuppicto right valignmiddle" width="60px"><a href="'.dol_buildpath('/'.$regs[2].'/admin/'.$regs[1],1).'?save_lastsearch_values=1&backtopage='.urlencode($backtourl).'" title="'.$langs->trans("Setup").'">'.img_picto($langs->trans("Setup"),"setup",'style="padding-right: 6px"').'</a></td>';
         		}
         		else
         		{
-        			print '<td class="tdsetuppicto right valignmiddle" width="60px"><a href="'.$objMod->config_page_url.'?backtopage='.urlencode($backtourl).'" title="'.$langs->trans("Setup").'">'.img_picto($langs->trans("Setup"),"setup",'style="padding-right: 6px"').'</a></td>';
+        			print '<td class="tdsetuppicto right valignmiddle" width="60px"><a href="'.$objMod->config_page_url.'?save_lastsearch_values=1&backtopage='.urlencode($backtourl).'" title="'.$langs->trans("Setup").'">'.img_picto($langs->trans("Setup"),"setup",'style="padding-right: 6px"').'</a></td>';
         		}
         	}
         	else

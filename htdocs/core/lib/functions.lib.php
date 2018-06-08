@@ -1,13 +1,13 @@
 <?php
 /* Copyright (C) 2000-2007	Rodolphe Quiedeville			<rodolphe@quiedeville.org>
  * Copyright (C) 2003		Jean-Louis Bergamo			<jlb@j1b.org>
- * Copyright (C) 2004-2013	Laurent Destailleur			<eldy@users.sourceforge.net>
+ * Copyright (C) 2004-2018	Laurent Destailleur			<eldy@users.sourceforge.net>
  * Copyright (C) 2004		Sebastien Di Cintio			<sdicintio@ressource-toi.org>
  * Copyright (C) 2004		Benoit Mortier				<benoit.mortier@opensides.be>
  * Copyright (C) 2004		Christophe Combelles			<ccomb@free.fr>
  * Copyright (C) 2005-2017	Regis Houssin				<regis.houssin@capnetworks.com>
  * Copyright (C) 2008		Raphael Bertrand (Resultic)	<raphael.bertrand@resultic.fr>
- * Copyright (C) 2010-2016	Juanjo Menent				<jmenent@2byte.es>
+ * Copyright (C) 2010-2018	Juanjo Menent				<jmenent@2byte.es>
  * Copyright (C) 2013		Cédric Salvador				<csalvador@gpcsolutions.fr>
  * Copyright (C) 2013-2017	Alexandre Spangaro			<aspangaro@zendsi.com>
  * Copyright (C) 2014		Cédric GROSS					<c.gross@kreiz-it.fr>
@@ -549,10 +549,10 @@ function GETPOST($paramname, $check='none', $method=0, $filter=NULL, $options=NU
 		case 'array':
 			if (! is_array($out) || empty($out)) $out=array();
 			break;
-		case 'nohtml':
+		case 'nohtml':		// Recommended for most scalar parameters
 			$out=dol_string_nohtmltag($out, 0);
 			break;
-		case 'alphanohtml':	// Recommended for search params
+		case 'alphanohtml':	// Recommended for search parameters
 			if (! is_array($out))
 			{
 				$out=trim($out);
@@ -578,12 +578,12 @@ function GETPOST($paramname, $check='none', $method=0, $filter=NULL, $options=NU
 		{
 			//var_dump($paramname.' - '.$out.' '.$user->default_values[$relativepathstring]['filters'][$paramname]);
 
-			// We save search key only if:
-			// - not empty, or
-			// - if value is empty and a default value exists that is not empty (it means we did a filter to an empty value when default was not).
+			// We save search key only if $out not empty that means:
+			// - posted value not empty, or
+			// - if posted value is empty and a default value exists that is not empty (it means we did a filter to an empty value when default was not).
 
 			//if (! empty($out) || ! empty($user->default_values[$relativepathstring]['filters'][$paramname]))
-			if (! empty($out))
+			if ($out != '')		// $out = '0' like 'abc' is a search criteria to keep
 			{
 				$user->lastsearch_values_tmp[$relativepathstring][$paramname]=$out;
 			}
@@ -1077,11 +1077,12 @@ function dol_syslog($message, $level = LOG_INFO, $ident = 0, $suffixinfilename='
  * 	@param	string	$picto				Add a picto on tab title
  *	@param	int		$pictoisfullpath	If 1, image path is a full path. If you set this to 1, you can use url returned by dol_buildpath('/mymodyle/img/myimg.png',1) for $picto.
  *  @param	string	$morehtmlright		Add more html content on right of tabs title
+ *  @param	string	$morecss			More Css
  * 	@return	void
  */
-function dol_fiche_head($links=array(), $active='0', $title='', $notab=0, $picto='', $pictoisfullpath=0, $morehtmlright='')
+function dol_fiche_head($links=array(), $active='0', $title='', $notab=0, $picto='', $pictoisfullpath=0, $morehtmlright='', $morecss='')
 {
-	print dol_get_fiche_head($links, $active, $title, $notab, $picto, $pictoisfullpath, $morehtmlright);
+	print dol_get_fiche_head($links, $active, $title, $notab, $picto, $pictoisfullpath, $morehtmlright, $morecss);
 }
 
 /**
@@ -1094,9 +1095,10 @@ function dol_fiche_head($links=array(), $active='0', $title='', $notab=0, $picto
  * 	@param	string	$picto				Add a picto on tab title
  *	@param	int		$pictoisfullpath	If 1, image path is a full path. If you set this to 1, you can use url returned by dol_buildpath('/mymodyle/img/myimg.png',1) for $picto.
  *  @param	string	$morehtmlright		Add more html content on right of tabs title
+ *  @param	string	$morecss			More Css
  * 	@return	string
  */
-function dol_get_fiche_head($links=array(), $active='', $title='', $notab=0, $picto='', $pictoisfullpath=0, $morehtmlright='')
+function dol_get_fiche_head($links=array(), $active='', $title='', $notab=0, $picto='', $pictoisfullpath=0, $morehtmlright='', $morecss='')
 {
 	global $conf, $langs, $hookmanager;
 
@@ -1161,7 +1163,7 @@ function dol_get_fiche_head($links=array(), $active='', $title='', $notab=0, $pi
 			{
 				if (!empty($links[$i][0]))
 				{
-					$out.='<a class="tabimage" href="'.$links[$i][0].'">'.$links[$i][1].'</a>'."\n";
+					$out.='<a class="tabimage'.($morecss?' '.$morecss:'').'" href="'.$links[$i][0].'">'.$links[$i][1].'</a>'."\n";
 				}
 				else
 				{
@@ -1173,13 +1175,13 @@ function dol_get_fiche_head($links=array(), $active='', $title='', $notab=0, $pi
 				//print "x $i $active ".$links[$i][2]." z";
 				if ($isactive)
 				{
-					$out.='<a'.(! empty($links[$i][2])?' id="'.$links[$i][2].'"':'').' class="tabactive tab inline-block" href="'.$links[$i][0].'">';
+					$out.='<a'.(! empty($links[$i][2])?' id="'.$links[$i][2].'"':'').' class="tabactive tab inline-block'.($morecss?' '.$morecss:'').'" href="'.$links[$i][0].'">';
 					$out.=$links[$i][1];
 					$out.='</a>'."\n";
 				}
 				else
 				{
-					$out.='<a'.(! empty($links[$i][2])?' id="'.$links[$i][2].'"':'').' class="tabunactive tab inline-block" href="'.$links[$i][0].'">';
+					$out.='<a'.(! empty($links[$i][2])?' id="'.$links[$i][2].'"':'').' class="tabunactive tab inline-block'.($morecss?' '.$morecss:'').'" href="'.$links[$i][0].'">';
 					$out.=$links[$i][1];
 					$out.='</a>'."\n";
 				}
@@ -1198,14 +1200,14 @@ function dol_get_fiche_head($links=array(), $active='', $title='', $notab=0, $pi
 			if (isset($links[$i][2]) && $links[$i][2] == 'image')
 			{
 				if (!empty($links[$i][0]))
-					$outmore.='<a class="tabimage" href="'.$links[$i][0].'">'.$links[$i][1].'</a>'."\n";
+					$outmore.='<a class="tabimage'.($morecss?' '.$morecss:'').'" href="'.$links[$i][0].'">'.$links[$i][1].'</a>'."\n";
 				else
 					$outmore.='<span class="tabspan">'.$links[$i][1].'</span>'."\n";
 
 			}
 			else if (! empty($links[$i][1]))
 			{
-				$outmore.='<a'.(! empty($links[$i][2])?' id="'.$links[$i][2].'"':'').' class="wordwrap inline-block" href="'.$links[$i][0].'">';
+				$outmore.='<a'.(! empty($links[$i][2])?' id="'.$links[$i][2].'"':'').' class="wordwrap inline-block'.($morecss?' '.$morecss:'').'" href="'.$links[$i][0].'">';
 				$outmore.=preg_replace('/([a-z])\/([a-z])/i', '\\1 / \\2', $links[$i][1]);	// Replace x/y with x / y to allow wrap on long composed texts.
 				$outmore.='</a>'."\n";
 			}
@@ -1224,7 +1226,7 @@ function dol_get_fiche_head($links=array(), $active='', $title='', $notab=0, $pi
 
 		$tabsname=str_replace("@", "", $picto);
 		$out.='<div id="moretabs'.$tabsname.'" class="inline-block tabsElem">';
-		$out.='<a href="#" class="tab moretab inline-block tabunactive">'.$langs->trans("More").'... ('.$nbintab.')</a>';
+		$out.='<a href="#" class="tab moretab inline-block tabunactive reposition">'.$langs->trans("More").'... ('.$nbintab.')</a>';
 		$out.='<div id="moretabsList'.$tabsname.'" style="position: absolute; '.$left.': -999em; text-align: '.$left.'; margin:0px; padding:2px">';
 		$out.=$outmore;
 		$out.='</div>';
@@ -1488,6 +1490,14 @@ function dol_banner_tab($object, $paramid, $morehtml='', $shownav=1, $fieldid='r
 	{
 		if ($object->frequency == 0) $morehtmlstatus.=$object->getLibStatut(2);
 		else $morehtmlstatus.=$object->getLibStatut(5);
+	}
+	elseif ($object->element == 'project_task')
+	{
+		$object->fk_statut = 1;
+		if ($object->progress > 0) $object->fk_statut = 2;
+		if ($object->progress >= 100) $object->fk_statut = 3;
+		$tmptxt=$object->getLibStatut(5);
+		$morehtmlstatus.=$tmptxt;		// No status on task
 	}
 	else { // Generic case
 		$tmptxt=$object->getLibStatut(6);
@@ -3723,7 +3733,7 @@ function load_fiche_titre($titre, $morehtmlright='', $picto='title_generic.png',
 	}
 	if (dol_strlen($morehtmlright))
 	{
-		$return.= '<td class="nobordernopadding titre_right" align="right" valign="middle">'.$morehtmlright.'</td>';
+		$return.= '<td class="nobordernopadding titre_right wordbreak" align="right" valign="middle">'.$morehtmlright.'</td>';
 	}
 	$return.= '</tr></table>'."\n";
 
@@ -4251,7 +4261,8 @@ function get_localtax($vatrate, $local, $thirdparty_buyer="", $thirdparty_seller
 
 		if ($local == 2)
 		{
-			if (! $mysoc->localtax2_assuj || (string) $vatratecleaned == "0") return 0;
+			//if (! $mysoc->localtax2_assuj || (string) $vatratecleaned == "0") return 0;
+			if (! $mysoc->localtax2_assuj) return 0;		// If main vat is 0, IRPF may be different than 0.
 			if ($thirdparty_seller->id == $mysoc->id)
 			{
 				if (! $thirdparty_buyer->localtax2_assuj) return 0;
@@ -4306,7 +4317,11 @@ function get_localtax($vatrate, $local, $thirdparty_buyer="", $thirdparty_seller
 			}
 			else  // i am the seller
 			{
-				if (!isOnlyOneLocalTax($local))  // This is for spain only, we don't return value found into datbase even if there is only one locatax vat.
+				if (in_array($mysoc->country_code, array('ES')))
+				{
+					return $thirdparty_buyer->localtax2_value;
+				}
+				else
 				{
 					return $conf->global->MAIN_INFO_VALUE_LOCALTAX2;
 				}
@@ -4487,50 +4502,16 @@ function getLocalTaxesFromRate($vatrate, $local, $buyer, $seller, $firstparamisi
 		$obj = $db->fetch_object($resql);
 		if ($local == 1)
 		{
-			if (! isOnlyOneLocalTax(1))
-			{
-				return array($obj->localtax1_type, get_localtax($vatrate, $local, $buyer, $seller), $obj->accountancy_code_sell, $obj->accountancy_code_buy);
-			}
-			else
-			{
-				return array($obj->localtax1_type, $obj->localtax1,$obj->accountancy_code_sell, $obj->accountancy_code_buy);
-			}
+			return array($obj->localtax1_type, get_localtax($vatrate, $local, $buyer, $seller), $obj->accountancy_code_sell, $obj->accountancy_code_buy);
 		}
 		elseif ($local == 2)
 		{
-			if (! isOnlyOneLocalTax(2))
-			{
-				return array($obj->localtax2_type, get_localtax($vatrate, $local, $buyer, $seller),$obj->accountancy_code_sell, $obj->accountancy_code_buy);
-			}
-			else
-			{
-				return array($obj->localtax2_type, $obj->localtax2,$obj->accountancy_code_sell, $obj->accountancy_code_buy);
-			}
+			return array($obj->localtax2_type, get_localtax($vatrate, $local, $buyer, $seller),$obj->accountancy_code_sell, $obj->accountancy_code_buy);
 		}
 		else
 		{
-			if(! isOnlyOneLocalTax(1))
-			{
-				if(! isOnlyOneLocalTax(2))
-				{
-					return array($obj->localtax1_type, get_localtax($vatrate, 1, $buyer, $seller), $obj->localtax2_type, get_localtax($vatrate, 2, $buyer, $seller), $obj->accountancy_code_sell,$obj->accountancy_code_buy);
-				}
-				else
-				{
-					return array($obj->localtax1_type, get_localtax($vatrate, 1, $buyer, $seller), $obj->localtax2_type, $obj->localtax2, $obj->accountancy_code_sell, $obj->accountancy_code_buy);
-				}
-			}
-			else
-			{
-				if(! isOnlyOneLocalTax(2))
-				{
-					return array($obj->localtax1_type, $obj->localtax1, $obj->localtax2_type, get_localtax($vatrate, 2, $buyer, $seller), $obj->accountancy_code_sell, $obj->accountancy_code_buy);
-				}
-				else
-				{
-					return array($obj->localtax1_type, $obj->localtax1, $obj->localtax2_type, $obj->localtax2, $obj->accountancy_code_sell, $obj->accountancy_code_buy);
-				}
-			}
+			return array($obj->localtax1_type, get_localtax($vatrate, 1, $buyer, $seller), $obj->localtax2_type, get_localtax($vatrate, 2, $buyer, $seller), $obj->accountancy_code_sell,$obj->accountancy_code_buy);
+
 		}
 	}
 
@@ -5442,6 +5423,7 @@ function getCommonSubstitutionArray($outputlangs, $onlykey=0, $exclude=null, $ob
 
 			$substitutionarray['__THIRDPARTY_ID__'] = '__THIRDPARTY_ID__';
 			$substitutionarray['__THIRDPARTY_NAME__'] = '__THIRDPARTY_NAME__';
+			$substitutionarray['__THIRDPARTY_EMAIL__'] = '__THIRDPARTY_EMAIL__';
 
 			if (is_object($object) && $object->element == 'shipping')
 			{
@@ -5505,11 +5487,15 @@ function getCommonSubstitutionArray($outputlangs, $onlykey=0, $exclude=null, $ob
 			{
 				$substitutionarray['__THIRDPARTY_ID__'] = (is_object($object)?$object->id:'');
 				$substitutionarray['__THIRDPARTY_NAME__'] = (is_object($object)?$object->name:'');
+				$substitutionarray['__THIRDPARTY_NAME_ALIAS__'] = (is_object($object)?$object->name_alias:'');
+				$substitutionarray['__THIRDPARTY_EMAIL__'] = (is_object($object)?$object->email:'');
 			}
 			elseif (is_object($object->thirdparty) && $object->thirdparty->id > 0)
 			{
 				$substitutionarray['__THIRDPARTY_ID__'] = (is_object($object->thirdparty)?$object->thirdparty->id:'');
 				$substitutionarray['__THIRDPARTY_NAME__'] = (is_object($object->thirdparty)?$object->thirdparty->name:'');
+				$substitutionarray['__THIRDPARTY_NAME_ALIAS__'] = (is_object($object->thirdparty)?$object->thirdparty->name_alias:'');
+				$substitutionarray['__THIRDPARTY_EMAIL__'] = (is_object($object->thirdparty)?$object->thirdparty->email:'');
 			}
 
 			if (is_object($object->projet) && $object->projet->id > 0)
@@ -5563,6 +5549,11 @@ function getCommonSubstitutionArray($outputlangs, $onlykey=0, $exclude=null, $ob
 		$substitutionarray['__AMOUNT_VAT__']      = is_object($object)?($object->total_vat?$object->total_vat:$object->total_tva):'';
  		if ($onlykey != 2 || $mysoc->useLocalTax(1)) $substitutionarray['__AMOUNT_TAX2__']     = is_object($object)?($object->total_localtax1?$object->total_localtax1:$object->total_localtax1):'';
 		if ($onlykey != 2 || $mysoc->useLocalTax(2)) $substitutionarray['__AMOUNT_TAX3__']     = is_object($object)?($object->total_localtax2?$object->total_localtax2:$object->total_localtax2):'';
+		$substitutionarray['__AMOUNT_FORMATED__']          = is_object($object)?price($object->total_ttc, 0, $outputlangs, 0, 0, -1, $conf->currency_code):'';
+		$substitutionarray['__AMOUNT_EXCL_TAX_FORMATED__'] = is_object($object)?price($object->total_ht, 0, $outputlangs, 0, 0, -1, $conf->currency_code):'';
+		$substitutionarray['__AMOUNT_VAT_FORMATED__']      = is_object($object)?($object->total_vat?price($object->total_vat, 0, $outputlangs, 0, 0, -1, $conf->currency_code):price($object->total_tva, 0, $outputlangs, 0, 0, -1, $conf->currency_code)):'';
+		if ($onlykey != 2 || $mysoc->useLocalTax(1)) $substitutionarray['__AMOUNT_TAX2_FORMATED__']     = is_object($object)?price($object->total_localtax1, 0, $outputlangs, 0, 0, -1, $conf->currency_code):'';
+		if ($onlykey != 2 || $mysoc->useLocalTax(2)) $substitutionarray['__AMOUNT_TAX3_FORMATED__']     = is_object($object)?price($object->total_localtax2, 0, $outputlangs, 0, 0, -1, $conf->currency_code):'';
 
 		/* TODO Add key for multicurrency
     	$substitutionarray['__AMOUNT_FORMATED__']          = is_object($object)?price($object->total_ttc, 0, $outputlangs, 0, 0, -1, $conf->currency_code):'';
@@ -5622,7 +5613,7 @@ function getCommonSubstitutionArray($outputlangs, $onlykey=0, $exclude=null, $ob
 			'__USER_LASTNAME__' => (string) $user->lastname,
 			'__USER_FIRSTNAME__' => (string) $user->firstname,
 			'__USER_FULLNAME__' => (string) $user->getFullName($outputlangs),
-			'__USER_SUPERVISOR_ID__' => (string) $user->fk_user
+			'__USER_SUPERVISOR_ID__' => (string) ($user->fk_user ? $user->fk_user : '0')
 			)
 		);
 	}
@@ -5635,8 +5626,8 @@ function getCommonSubstitutionArray($outputlangs, $onlykey=0, $exclude=null, $ob
 }
 
 /**
- *  Make substitution into a text string, replacing keys with vals from $substitutionarray (oldval=>newval).
- *  Texts like __(TranslationKey|langfile)__ and __[ConstantKey]__ are also replaced.
+ *  Make substitution into a text string, replacing keys with vals from $substitutionarray (oldval=>newval),
+ *  and texts like __(TranslationKey|langfile)__ and __[ConstantKey]__ are also replaced.
  *  Example of usage:
  *  $substitutionarray = getCommonSubstitutionArray($langs, 0, null, $thirdparty);
  *  complete_substitutions_array($substitutionarray, $langs, $thirdparty);
@@ -5680,7 +5671,8 @@ function make_substitutions($text, $substitutionarray, $outputlangs=null)
 		if (dol_textishtml($text,1)) $msgishtml = 1;
 
 		$keyfound = $reg[1];
-		$newval=empty($conf->global->$keyfound)?'':$conf->global->$keyfound;
+		if (preg_match('/(_pass|password|secret|_key|key$)/i', $keyfound)) $newval = '*****forbidden*****';
+		else $newval=empty($conf->global->$keyfound)?'':$conf->global->$keyfound;
 		$text = preg_replace('/__\['.preg_quote($keyfound, '/').'\]__/', $msgishtml?dol_htmlentitiesbr($newval):$newval, $text);
 	}
 
@@ -5817,7 +5809,7 @@ function dolGetFirstLastname($firstname,$lastname,$nameorder=-1)
 
 	$ret='';
 	// If order not defined, we use the setup
-	if ($nameorder < 0) $nameorder=(empty($conf->global->MAIN_FIRSTNAME_NAME_POSITION));
+	if ($nameorder < 0) $nameorder=$conf->global->MAIN_FIRSTNAME_NAME_POSITION;
 	if ($nameorder && ((string) $nameorder != '2'))
 	{
 		$ret.=$firstname;
@@ -6718,6 +6710,8 @@ function natural_search($fields, $value, $mode=0, $nofirstand=0)
 				$i3 = 0;
 				foreach($tmpcrits as $tmpcrit)
 				{
+					if(empty($tmpcrit)) continue;
+
 					$newres .= (($i2 > 0 || $i3 > 0) ? ' OR ' : '');
 
 					if (preg_match('/\.(id|rowid)$/', $field))	// Special case for rowid that is sometimes a ref so used as a search field

@@ -23,8 +23,8 @@
 
 // $mysoc must be defined
 // $id must be defined
-// $paramname must be defined
-// $mode must be defined (used to know the automatic BCC to add)
+// $paramname may be defined
+// $autocopy may be defined (used to know the automatic BCC to add)
 // $trigger_name must be set (can be '')
 // $actiontypecode can be set
 // $object and $uobject may be defined
@@ -319,7 +319,6 @@ if (($action == 'send' || $action == 'relance') && ! $_POST['addfile'] && ! $_PO
 			$filename = $attachedfiles['names'];
 			$mimetype = $attachedfiles['mimes'];
 
-
 			// Feature to push mail sent into Sent folder
 			if (! empty($conf->dolimail->enabled))
 			{
@@ -385,7 +384,7 @@ if (($action == 'send' || $action == 'relance') && ! $_POST['addfile'] && ! $_PO
 
 			if ($mailfile->error)
 			{
-				setEventMessage($mailfile->error, 'errors');
+				setEventMessages($mailfile->error, $mailfile->errors, 'errors');
 				$action='presend';
 			}
 			else

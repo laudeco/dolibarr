@@ -541,8 +541,8 @@ if ($type) $sql.= " AND ca.id = ".$type;
 if ($status == '0') { $sql.= " AND a.percent = 0"; }
 if ($status == '-1') { $sql.= " AND a.percent = -1"; }	// Not applicable
 if ($status == '50') { $sql.= " AND (a.percent > 0 AND a.percent < 100)"; }	// Running already started
-if ($status == 'done' || $status == '100') { $sql.= " AND (a.percent = 100 OR (a.percent = -1 AND a.datep2 <= '".$db->idate($now)."'))"; }
-if ($status == 'todo') { $sql.= " AND ((a.percent >= 0 AND a.percent < 100) OR (a.percent = -1 AND a.datep2 > '".$db->idate($now)."'))"; }
+if ($status == 'done' || $status == '100') { $sql.= " AND (a.percent = 100)"; }
+if ($status == 'todo') { $sql.= " AND (a.percent >= 0 AND a.percent < 100)"; }
 // We must filter on assignement table
 if ($filtert > 0 || $usergroup > 0)
 {
@@ -1475,10 +1475,12 @@ function show_day_events($db, $day, $month, $year, $monthshown, $style, &$eventa
                         if ($event->type_code == 'ICALEVENT') print $titletoshow;
                         else
                         {
-                            $savlabel=$event->libelle;
-                            $event->libelle=$titletoshow;
-                            print $event->getNomUrl(0,$maxnbofchar,'cal_event','',0,1);
-                            $event->libelle=$savlabel;
+                        	$savlabel=$event->label?$event->label:$event->libelle;
+                        	$event->label=$titletoshow;
+                        	$event->libelle=$titletoshow;
+                        	print $event->getNomUrl(0,$maxnbofchar,'cal_event','',0,1);
+                        	$event->label=$savlabel;
+                        	$event->libelle=$savlabel;
                         }
 
                         // Loop on each assigned user
@@ -1495,7 +1497,7 @@ function show_day_events($db, $day, $month, $year, $monthshown, $style, &$eventa
                                 $cacheusers[$tmpid]=$newuser;
                             }
 
-                            $listofusertoshow.=$cacheusers[$tmpid]->getNomUrl(-3, '', 0, 0, 0, 0, '', 'valigntextbottom');
+                            $listofusertoshow.=$cacheusers[$tmpid]->getNomUrl(-3, '', 0, 0, 0, 0, '', 'paddingright valigntextbottom');
                         }
                         print $listofusertoshow;
 

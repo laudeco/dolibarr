@@ -343,6 +343,9 @@ class Conf
 			$this->fournisseur->facture=new stdClass();
 			$this->fournisseur->facture->dir_output =$rootfordata."/fournisseur/facture";
 			$this->fournisseur->facture->dir_temp   =$rootfordata."/fournisseur/facture/temp";
+			$this->supplierproposal=new stdClass();
+			$this->supplierproposal->dir_output=$rootfordata."/supplier_proposal";
+			$this->supplierproposal->dir_temp=$rootfordata."/supplier_proposal/temp";
 			$this->fournisseur->payment=new stdClass();
 			$this->fournisseur->payment->dir_output =$rootfordata."/fournisseur/payment";
 			$this->fournisseur->payment->dir_temp   =$rootfordata."/fournisseur/payment/temp";
@@ -358,6 +361,9 @@ class Conf
     			$this->supplier_invoice->enabled=1;
     			$this->supplier_invoice->dir_output=$rootfordata."/fournisseur/facture";
     			$this->supplier_invoice->dir_temp=$rootfordata."/fournisseur/facture/temp";
+    			$this->supplierproposal=new stdClass();
+    			$this->supplierproposal->dir_output=$rootfordata."/supplier_proposal";
+    			$this->supplierproposal->dir_temp=$rootfordata."/supplier_proposal/temp";
 			}
 		}
 
@@ -422,7 +428,7 @@ class Conf
 		if (empty($this->global->MAIN_MONNAIE)) $this->global->MAIN_MONNAIE='EUR';
 		$this->currency=$this->global->MAIN_MONNAIE;
 
-		if (empty($conf->global->MAIN_BROWSER_NOTIFICATION_FREQUENCY)) $conf->global->MAIN_BROWSER_NOTIFICATION_FREQUENCY = 30;   // Less than 1 minutes to be sure
+		if (empty($this->global->MAIN_BROWSER_NOTIFICATION_FREQUENCY)) $this->global->MAIN_BROWSER_NOTIFICATION_FREQUENCY = 30;   // Less than 1 minutes to be sure
 
 		// conf->global->ACCOUNTING_MODE = Option des modules Comptabilites (simple ou expert). Defini le mode de calcul des etats comptables (CA,...)
         if (empty($this->global->ACCOUNTING_MODE)) $this->global->ACCOUNTING_MODE='RECETTES-DEPENSES';  // By default. Can be 'RECETTES-DEPENSES' ou 'CREANCES-DETTES'
@@ -581,13 +587,13 @@ class Conf
 		if (! isset($this->global->THEME_HIDE_BORDER_ON_INPUT)) $this->global->THEME_HIDE_BORDER_ON_INPUT=0;
 
 		// Save inconsistent option
-		if (empty($conf->global->AGENDA_USE_EVENT_TYPE) && (! isset($conf->global->AGENDA_DEFAULT_FILTER_TYPE) || $conf->global->AGENDA_DEFAULT_FILTER_TYPE == 'AC_NON_AUTO'))
+		if (empty($this->global->AGENDA_USE_EVENT_TYPE) && (! isset($this->global->AGENDA_DEFAULT_FILTER_TYPE) || $this->global->AGENDA_DEFAULT_FILTER_TYPE == 'AC_NON_AUTO'))
 		{
-		    $conf->global->AGENDA_DEFAULT_FILTER_TYPE='0';    // 'AC_NON_AUTO' does not exists when AGENDA_DEFAULT_FILTER_TYPE is not on.
+			$this->global->AGENDA_DEFAULT_FILTER_TYPE='0';    // 'AC_NON_AUTO' does not exists when AGENDA_DEFAULT_FILTER_TYPE is not on.
 		}
 
-		$conf->global->MAIN_MODULE_DOLISTORE_API_SRV='https://www.dolistore.com';
-		$conf->global->MAIN_MODULE_DOLISTORE_API_KEY='dolistorecatalogpublickey1234567';
+		$this->global->MAIN_MODULE_DOLISTORE_API_SRV='https://www.dolistore.com';
+		$this->global->MAIN_MODULE_DOLISTORE_API_KEY='dolistorecatalogpublickey1234567';
 
 		// For backward compatibility
 		if (isset($this->product))   $this->produit=$this->product;

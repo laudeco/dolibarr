@@ -833,11 +833,11 @@ Permission1251=Run mass imports of external data into database (data load)
 Permission1321=Export customer invoices, attributes and payments
 Permission1322=Reopen a paid bill
 Permission1421=Export customer orders and attributes
-Permission20001=Read leave requests (yours and your subordinates)
-Permission20002=Create/modify your leave requests
+Permission20001=Read leave requests (your leaves and the one of your subordinates)
+Permission20002=Create/modify your leave requests (yours leaves and the one of your subordinates)
 Permission20003=Delete leave requests
-Permission20004=Read all leave requests (even user not subordinates)
-Permission20005=Create/modify leave requests for everybody
+Permission20004=Read all leave requests (even of user not subordinates)
+Permission20005=Create/modify leave requests for everybody (even of user not subordinates)
 Permission20006=Admin leave requests (setup and update balance)
 Permission23001=Read Scheduled job
 Permission23002=Create/update Scheduled job
@@ -1505,7 +1505,7 @@ OSCommerceTestOk=Connection to server '%s' on database '%s' with user '%s' succe
 OSCommerceTestKo1=Connection to server '%s' succeed but database '%s' could not be reached.
 OSCommerceTestKo2=Connection to server '%s' with user '%s' failed.
 ##### Stock #####
-StockSetup=Warehouse module setup
+StockSetup=Stock module setup
 IfYouUsePointOfSaleCheckModule=If you use a Point of Sale module (POS module provided by default or another external module), this setup may be ignored by your Point Of Sale module. Most point of sales modules are designed to create immediatly an invoice and decrease stock by default whatever are options here. So, if you need or not to have a stock decrease when registering a sell from your Point Of Sale, check also your POS module set up.
 ##### Menu #####
 MenuDeleted=Menu deleted

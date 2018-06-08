@@ -224,8 +224,8 @@ $total = 0;
 $i=0;
 
 // Load arrays of datas
-$x_coll = vat_by_date($db, 0, 0, $date_start, $date_end, $modetax, 'sell');
-$x_paye = vat_by_date($db, 0, 0, $date_start, $date_end, $modetax, 'buy');
+$x_coll = tax_by_date('vat', $db, 0, 0, $date_start, $date_end, $modetax, 'sell');
+$x_paye = tax_by_date('vat', $db, 0, 0, $date_start, $date_end, $modetax, 'buy');
 
 if (! is_array($x_coll) || ! is_array($x_paye))
 {
@@ -447,7 +447,7 @@ else
 				$ratiopaymentinvoice=1;
 				if ($modetax == 0)
 				{
-					if (isset($fields['payment_amount']) && $fields['ftotal_ttc']) $ratiopaymentinvoice=($fields['payment_amount']/$fields['ftotal_ttc']);
+					if (isset($fields['payment_amount']) && price2num($fields['ftotal_ttc'])) $ratiopaymentinvoice=($fields['payment_amount']/$fields['ftotal_ttc']);
 					print '<td class="nowrap" align="right">';
 					//print $fields['totalht']."-".$fields['payment_amount']."-".$fields['ftotal_ttc'];
 					if ($fields['payment_amount'] && $fields['ftotal_ttc'])

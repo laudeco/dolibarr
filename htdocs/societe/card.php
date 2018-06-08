@@ -10,6 +10,8 @@
  * Copyright (C) 2015       Jean-François Ferry     <jfefe@aternatik.fr>
  * Copyright (C) 2015       Marcos García           <marcosgdf@gmail.com>
  * Copyright (C) 2015       Raphaël Doursenaud      <rdoursenaud@gpcsolutions.fr>
+ * Copyright (C) 2018       Nicolas ZABOURI	    <info@inovea-conseil.com>
+ * Copyright (C) 2018       Ferran Marcet		    <fmarcet@2byte.es.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +60,7 @@ $mesg=''; $error=0; $errors=array();
 $action		= (GETPOST('action','aZ09') ? GETPOST('action','aZ09') : 'view');
 $cancel		= GETPOST('cancel','alpha');
 $backtopage	= GETPOST('backtopage','alpha');
-$confirm		= GETPOST('confirm');
+$confirm	= GETPOST('confirm','alpha');
 
 $socid		= GETPOST('socid','int')?GETPOST('socid','int'):GETPOST('id','int');
 if ($user->societe_id) $socid=$user->societe_id;
@@ -73,7 +75,9 @@ $extralabels=$extrafields->fetch_name_optionals_label($object->table_element);
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
 $hookmanager->initHooks(array('thirdpartycard','globalcard'));
 
-if ($action == 'view' && $object->fetch($socid)<=0)
+if ($socid > 0) $object->fetch($socid);
+
+if (! ($object->id > 0) && $action == 'view')
 {
 	$langs->load("errors");
 	print($langs->trans('ErrorRecordNotFound'));
@@ -117,8 +121,6 @@ if (empty($reshook))
 
 	if ($action == 'confirm_merge' && $confirm == 'yes' && $user->rights->societe->creer)
 	{
-		$object->fetch($socid);
-
 		$error = 0;
 		$soc_origin_id = GETPOST('soc_origin', 'int');
 		$soc_origin = new Societe($db);
@@ -179,9 +181,15 @@ if (empty($reshook))
 
 				// Merge categories
 				$static_cat = new Categorie($db);
-				$custcats = $static_cat->containing($soc_origin->id, 'customer', 'id');
+
+				$custcats_ori = $static_cat->containing($soc_origin->id, 'customer', 'id');
+				$custcats = $static_cat->containing($object->id, 'customer', 'id');
+				$custcats = array_merge($custcats,$custcats_ori);
 				$object->setCategories($custcats, 'customer');
-				$suppcats = $static_cat->containing($soc_origin->id, 'supplier', 'id');
+
+				$suppcats_ori = $static_cat->containing($soc_origin->id, 'supplier', 'id');
+				$suppcats = $static_cat->containing($object->id, 'supplier', 'id');
+				$suppcats = array_merge($suppcats,$suppcats_ori);
 				$object->setCategories($suppcats, 'supplier');
 
 				// If thirdparty has a new code that is same than origin, we clean origin code to avoid duplicate key from database unique keys.
@@ -209,7 +217,7 @@ if (empty($reshook))
 					$objects = array(
 						'Adherent' => '/adherents/class/adherent.class.php',
 						'Societe' => '/societe/class/societe.class.php',
-						'Categorie' => '/categories/class/categorie.class.php',
+						//'Categorie' => '/categories/class/categorie.class.php',
 						'ActionComm' => '/comm/action/class/actioncomm.class.php',
 						'Propal' => '/comm/propal/class/propal.class.php',
 						'Commande' => '/commande/class/commande.class.php',
@@ -645,8 +653,10 @@ if (empty($reshook))
                 if ($result <=  0)
                 {
                     setEventMessages($object->error, $object->errors, 'errors');
-                  	$error++;
+                    $errors = $object->errors;
+                    $error++;
                 }
+
 				// Prevent thirdparty's emptying if a user hasn't rights $user->rights->categorie->lire (in such a case, post of 'custcats' is not defined)
 				if (!empty($user->rights->categorie->lire))
 				{
@@ -727,6 +737,7 @@ if (empty($reshook))
                 	{
                 		$error++;
                 		$object->error .= $object->db->lasterror();
+                		setEventMessages($object->error, $object->errors, 'errors');
                 	}
                 }
 
@@ -764,7 +775,7 @@ if (empty($reshook))
 
         if ($result > 0)
         {
-            header("Location: ".DOL_URL_ROOT."/societe/list.php?delsoc=".urlencode($object->name));
+            header("Location: ".DOL_URL_ROOT."/societe/list.php?restore_lastsearch_values=1&delsoc=".urlencode($object->name));
             exit;
         }
         else
@@ -790,8 +801,10 @@ if (empty($reshook))
     	$result = $object->setIncoterms(GETPOST('incoterm_id', 'int'), GETPOST('location_incoterms', 'alpha'));
     }
 
-    // Actions to send emails
     $id=$socid;
+    $object->fetch($socid);
+
+    // Actions to send emails
     $trigger_name='COMPANY_SENTBYMAIL';
     $paramname='socid';
     $mode='emailfromthirdparty';
@@ -1145,7 +1158,7 @@ else
 
         // Address
         print '<tr><td class="tdtop">'.fieldLabel('Address','address').'</td>';
-	    print '<td colspan="3"><textarea name="address" id="address" class="quatrevingtpercent" rows="'._ROWS_2.'" wrap="soft">';
+	    print '<td colspan="3"><textarea name="address" id="address" class="quatrevingtpercent" rows="'.ROWS_2.'" wrap="soft">';
         print $object->address;
         print '</textarea></td></tr>';
 
@@ -1639,12 +1652,12 @@ else
             }
             else if ($object->codeclient_modifiable())
             {
-                print '<input type="text" name="code_client" id="customer_code" size="16" value="'.$object->code_client.'" maxlength="15">';
+            	print '<input type="text" name="code_client" id="customer_code" size="16" value="'.dol_escape_htmltag($object->code_client).'" maxlength="15">';
             }
             else
             {
                 print $object->code_client;
-                print '<input type="hidden" name="code_client" value="'.$object->code_client.'">';
+                print '<input type="hidden" name="code_client" value="'.dol_escape_htmltag($object->code_client).'">';
             }
             print '</td><td>';
             $s=$modCodeClient->getToolTip($langs,$object,0);
@@ -1875,7 +1888,9 @@ else
 
             // Capital
             print '<tr><td>'.fieldLabel('Capital','capital').'</td>';
-	        print '<td colspan="3"><input type="text" name="capital" id="capital" size="10" value="'.$object->capital.'"> <font class="hideonsmartphone">'.$langs->trans("Currency".$conf->currency).'</font></td></tr>';
+	        print '<td colspan="3"><input type="text" name="capital" id="capital" size="10" value="';
+	        print dol_escape_htmltag(price($object->capital));
+	        print '"> <font class="hideonsmartphone">'.$langs->trans("Currency".$conf->currency).'</font></td></tr>';
 
             // Default language
             if (! empty($conf->global->MAIN_MULTILANGS))

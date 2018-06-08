@@ -342,6 +342,7 @@ class Contact extends CommonObject
 		$sql .= ", email='".$this->db->escape($this->email)."'";
 		$sql .= ", skype='".$this->db->escape($this->skype)."'";
 		$sql .= ", photo='".$this->db->escape($this->photo)."'";
+		$sql .= ", birthday=".($this->birthday ? "'".$this->db->idate($this->birthday)."'" : "null");
 		$sql .= ", note_private = ".(isset($this->note_private)?"'".$this->db->escape($this->note_private)."'":"null");
 		$sql .= ", note_public = ".(isset($this->note_public)?"'".$this->db->escape($this->note_public)."'":"null");
 		$sql .= ", phone = ".(isset($this->phone_pro)?"'".$this->db->escape($this->phone_pro)."'":"null");
@@ -588,8 +589,8 @@ class Contact extends CommonObject
 		$resql = $this->db->query($sql);
 		if (! $resql)
 		{
-            $error++;
-		    $this->error=$this->db->lasterror();
+			$error++;
+			$this->error=$this->db->lasterror();
 		}
 
 		// Mis a jour alerte birthday
@@ -1081,9 +1082,10 @@ class Contact extends CommonObject
 	 *	@param		int			$maxlen						Max length of
 	 *  @param		string		$moreparam					Add more param into URL
      *  @param      int     	$save_lastsearch_value		-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+	 *	@param		int			$notooltip					1=Disable tooltip
 	 *	@return		string									String with URL
 	 */
-	function getNomUrl($withpicto=0, $option='', $maxlen=0, $moreparam='', $save_lastsearch_value=-1)
+	function getNomUrl($withpicto=0, $option='', $maxlen=0, $moreparam='', $save_lastsearch_value=-1, $notooltip=0)
 	{
 		global $conf, $langs, $hookmanager;
 
@@ -1115,13 +1117,16 @@ class Contact extends CommonObject
 
         $linkstart = '<a href="'.$url.'"';
         $linkclose="";
-    	if (! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
-        {
-            $label=$langs->trans("ShowContact");
-            $linkclose.=' alt="'.dol_escape_htmltag($label, 1).'"';
-        }
-       	$linkclose.= ' title="'.dol_escape_htmltag($label, 1).'"';
-       	$linkclose.= ' class="classfortooltip">';
+		if (empty($notooltip)) {
+	    	if (! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER))
+    	    {
+        	    $label=$langs->trans("ShowContact");
+            	$linkclose.=' alt="'.dol_escape_htmltag($label, 1).'"';
+        	}
+	       	$linkclose.= ' title="'.dol_escape_htmltag($label, 1).'"';
+    	   	$linkclose.= ' class="classfortooltip"';
+		}
+		$linkclose.='>';
 
 		if (! is_object($hookmanager))
 		{

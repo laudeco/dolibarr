@@ -545,9 +545,10 @@ class FormCompany
 	 * 	@param	array		$limitto		Disable answers that are not id in this array list
 	 *  @param	int			$forceid		This is to force another object id than object->id
      *  @param	string		$moreparam		String with more param to add into url when noajax search is used.
+     *  @param	string		$morecss		More CSS on select component
 	 * 	@return int 						The selected third party ID
 	 */
-	function selectCompaniesForNewContact($object, $var_id, $selected='', $htmlname='newcompany', $limitto='', $forceid=0, $moreparam='')
+	function selectCompaniesForNewContact($object, $var_id, $selected='', $htmlname='newcompany', $limitto='', $forceid=0, $moreparam='', $morecss='')
 	{
 		global $conf, $langs;
 
@@ -598,7 +599,8 @@ class FormCompany
 						var method = obj.method;
 						var url = obj.url;
 						var htmlname = obj.htmlname;
-			    		console.log("Run runJsCodeForEvent-'.$htmlname.' from selectCompaniesForNewContact id="+id+" method="+method+" showempty="+showempty+" url="+url+" htmlname="+htmlname);
+						var showempty = obj.showempty;
+						console.log("Run runJsCodeForEvent-'.$htmlname.' from selectCompaniesForNewContact id="+id+" method="+method+" showempty="+showempty+" url="+url+" htmlname="+htmlname);
 						$.getJSON(url,
 							{
 								action: method,
@@ -649,7 +651,7 @@ class FormCompany
 			$resql = $this->db->query($sql);
 			if ($resql)
 			{
-				print '<select class="flat" id="'.$htmlname.'" name="'.$htmlname.'"';
+				print '<select class="flat'.($morecss?' '.$morecss:'').'" id="'.$htmlname.'" name="'.$htmlname.'"';
 				if ($conf->use_javascript_ajax)
 				{
 					$javaScript = "window.location='".$_SERVER['PHP_SELF']."?".$var_id."=".($forceid>0?$forceid:$object->id).$moreparam."&".$htmlname."=' + form.".$htmlname.".options[form.".$htmlname.".selectedIndex].value;";
