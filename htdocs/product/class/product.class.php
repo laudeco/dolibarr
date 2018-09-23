@@ -1000,7 +1000,7 @@ class Product extends CommonObject
 				if ($this->db->errno() == 'DB_ERROR_RECORD_ALREADY_EXISTS')
 				{
 					$langs->load("errors");
-					if (empty($conf->barcode->enabled)) $this->error=$langs->trans("Error")." : ".$langs->trans("ErrorProductAlreadyExists",$this->ref);
+					if (empty($conf->barcode->enabled) || empty($this->barcode)) $this->error=$langs->trans("Error")." : ".$langs->trans("ErrorProductAlreadyExists",$this->ref);
 					else $this->error=$langs->trans("Error")." : ".$langs->trans("ErrorProductBarCodeAlreadyExists",$this->barcode);
 					$this->errors[]=$this->error;
 					$this->db->rollback();
@@ -1704,7 +1704,7 @@ class Product extends CommonObject
 				$price_ttc = price2num($price_ttc,'MU');
 
 				if ( $newminprice !== '' || $newminprice === 0)
-				{                                    
+				{
 					$price_min = price2num($newminprice,'MU');
 					$price_min_ttc = price2num($newminprice) * (1 + ($newvat / 100));
 					$price_min_ttc = price2num($price_min_ttc,'MU');
@@ -2271,8 +2271,8 @@ class Product extends CommonObject
 					}
 				}
 			}
-			
-			// If stock decrease is on invoice validation, the theorical stock continue to 
+
+			// If stock decrease is on invoice validation, the theorical stock continue to
 			// count the orders to ship in theorical stock when some are already removed b invoice validation.
 			// If option DECREASE_ONLY_UNINVOICEDPRODUCTS is on, we make a compensation.
 			if (! empty($conf->global->STOCK_CALCULATE_ON_BILL))
@@ -4571,8 +4571,6 @@ class Product extends CommonObject
 		}
 
 		$langs->load('products');
-
-		$this->db->begin();
 
 		$label_type = 'label';
 
