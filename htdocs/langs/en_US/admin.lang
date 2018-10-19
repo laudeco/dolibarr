@@ -1207,7 +1207,7 @@ WatermarkOnDraft=Watermark on draft document
 JSOnPaimentBill=Activate feature to autofill payment lines on payment form
 CompanyIdProfChecker=Rules for Professional IDs
 MustBeUnique=Must be unique?
-MustBeMandatory=Mandatory to create third parties?
+MustBeMandatory=Mandatory to create third parties (if vat number or type of company defined) ?
 MustBeInvoiceMandatory=Mandatory to validate invoices?
 TechnicalServicesProvided=Technical services provided
 #####DAV #####
@@ -1788,6 +1788,7 @@ MAIN_PDF_MARGIN_LEFT=Left margin on PDF
 MAIN_PDF_MARGIN_RIGHT=Right margin on PDF
 MAIN_PDF_MARGIN_TOP=Top margin on PDF
 MAIN_PDF_MARGIN_BOTTOM=Bottom margin on PDF
+NothingToSetup=There is no specific setup to do for this module.
 SetToYesIfGroupIsComputationOfOtherGroups=Set this to yes if this group is a computation of other groups
 EnterCalculationRuleIfPreviousFieldIsYes=Enter calculcation rule if previous field was set to Yes (For example 'CODEGRP1+CODEGRP2')
 SeveralLangugeVariatFound=Several language variants found
