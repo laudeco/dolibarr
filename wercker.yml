@@ -2,7 +2,7 @@ box: php
 build:
   steps:
     - script:
-        name: echo
+        name: echo 2
         code: |
           echo "Hello belgian Balloon Club - thanks for the contribution !"
     - install-packages:
