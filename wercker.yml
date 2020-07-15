@@ -1,0 +1,50 @@
+box: php
+build:
+  steps:
+    - install-packages:
+        packages: git unzip
+
+deploy:
+  steps:
+    - install-packages:
+        packages: openssh-client rsync git unzip
+    - add-to-known_hosts:
+        hostname: $HOST_NAME
+    - mktemp:
+        envvar: PRIVATEKEY_PATH
+    - create-file:
+        name: write key
+        filename: $PRIVATEKEY_PATH
+        content: $PRIVATEKEY_FILE_PRIVATE
+        overwrite: true
+        hide-from-log: true
+    - script:
+        name: rsync - LX
+        code: |-
+          rsync -ravz -e "ssh -i $PRIVATEKEY_PATH" -h --stats \
+          --update \
+          --include 'htdocs/***' \
+          --include 'scripts/***' \
+          --exclude '*' . $SERVER_PATH
+deployBe:
+  steps:
+    - install-packages:
+        packages: openssh-client rsync git unzip
+    - add-to-known_hosts:
+        hostname: $HOST_NAME
+    - mktemp:
+        envvar: PRIVATEKEY_PATH
+    - create-file:
+        name: write key
+        filename: $PRIVATEKEY_PATH
+        content: $PRIVATEKEY_FILE_PRIVATE
+        overwrite: true
+        hide-from-log: true
+    - script:
+        name: rsync
+        code: |-
+          rsync -ravz -e "ssh -i $PRIVATEKEY_PATH" -h --stats \
+          --update \
+          --include 'htdocs/***' \
+          --include 'scripts/***' \
+          --exclude '*' . $SERVER_PATH
